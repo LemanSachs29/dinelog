@@ -1,8 +1,8 @@
 # DineLog Project Context
 
 ## Current status
-Phase 8 complete — Meal history screens fully implemented.
-MealCard, MealListScreen (with logout), MealDetailScreen (read-only, cross-stack nav).
+Phase 9 complete — 34 automated tests, all passing.
+npm test → 34 tests pass across 6 suites (unit + components).
 App compiles with zero TypeScript errors.
 
 The app is for COM6031M Smartphone Application Design and Development Component 2.
@@ -104,5 +104,5 @@ No business logic yet.
 6. ~~Phase 6 — Add meal screen~~ ✅ Done
 7. ~~Phase 7 — Confirmation screen~~ ✅ Done
 8. ~~Phase 8 — Meal history screens (MealList + MealDetail)~~ ✅ Done
-9. Phase 9 — Tests (28 test cases)
+9. ~~Phase 9 — Tests (34 test cases)~~ ✅ Done
 10. Phase 10 — README
