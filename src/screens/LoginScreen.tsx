@@ -1,128 +1,232 @@
 /**
- * LoginScreen
+ * src/screens/LoginScreen.tsx
  *
- * Entry point of the app.  Allows users to log in with username + password
- * or with biometric authentication.
+ * Entry screen — username + password login with biometric shortcut.
  *
- * Phase 1: placeholder navigation only.
- * Phase 3: form inputs, validation, AuthContext integration, biometric call.
+ * Flow:
+ *   1. User fills in username and password.
+ *   2. PrimaryButton press → validateLogin() → field errors if invalid.
+ *   3. If valid → AuthContext.login() →
+ *        'ok'      → AppNavigator auto-navigates to Main (no navigate() call needed)
+ *        'invalid' → submitError shown below the password field
+ *   4. Biometric button → AuthContext.loginBiometric() →
+ *        'ok'          → AppNavigator auto-navigates to Main
+ *        'unavailable' → inline message below the button
+ *        'failed'      → inline message below the button
  */
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+import React, { useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Colors } from '../constants/colors';
 import { FontSize } from '../constants/typography';
+import { useAuthContext } from '../context/AuthContext';
+import { validateLogin } from '../utils/validation';
+import { ScreenTitle } from '../components/ScreenTitle';
+import { FormInput } from '../components/FormInput';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { SecondaryButton } from '../components/SecondaryButton';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export function LoginScreen({ navigation }: Props) {
+  const { login, loginBiometric } = useAuthContext();
+
+  // ── Form state ────────────────────────────────────────────────────────────
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Field-level errors (from validateLogin)
+  const [fieldErrors, setFieldErrors] = useState<{
+    username?: string;
+    password?: string;
+  }>({});
+
+  // Server-level error shown below the form (wrong credentials)
+  const [submitError, setSubmitError] = useState('');
+
+  // Biometric result message shown below the biometric button
+  const [biometricMsg, setBiometricMsg] = useState('');
+
+  // Prevents double-submit while the async call is in flight
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Ref for moving focus from username → password via the keyboard "Next" key
+  const passwordRef = useRef<TextInput>(null);
+
+  // ── Handlers ──────────────────────────────────────────────────────────────
+
+  function clearErrors() {
+    setFieldErrors({});
+    setSubmitError('');
+    setBiometricMsg('');
+  }
+
+  async function handleLogin() {
+    clearErrors();
+
+    const { valid, errors } = validateLogin({ username, password });
+    if (!valid) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await login(username.trim(), password);
+
+    if (result === 'invalid') {
+      setSubmitError('Username or password is incorrect.');
+      setIsSubmitting(false);
+      // On 'ok': AuthContext sets currentUser → AppNavigator renders Main automatically
+    }
+  }
+
+  async function handleBiometric() {
+    clearErrors();
+    const result = await loginBiometric();
+    if (result === 'unavailable') {
+      setBiometricMsg('Biometric authentication is not available on this device.');
+    } else if (result === 'failed') {
+      setBiometricMsg('Biometric authentication failed. Please try again.');
+    }
+    // On 'ok': AuthContext sets currentUser → AppNavigator renders Main automatically
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-
-        {/* ── Title ─────────────────────────────────────────────────────── */}
-        <Text style={styles.title}>Login</Text>
-        <View style={styles.titleUnderline} />
-
-        {/* ── Placeholder notice ────────────────────────────────────────── */}
-        <Text style={styles.description}>
-          Phase 3 will add username + password inputs and real authentication.
-          {'\n\n'}
-          Use the buttons below to navigate the app structure.
-        </Text>
-
-        {/* ── TODO Phase 3: Username input ─────────────────────────────── */}
-        {/* ── TODO Phase 3: Password input ─────────────────────────────── */}
-
-        {/* ── Primary action ────────────────────────────────────────────── */}
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={() => navigation.navigate('Main')}
-          activeOpacity={0.8}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.buttonPrimaryText}>Execute Login</Text>
-        </TouchableOpacity>
+          <ScreenTitle title="Login" />
 
-        {/* ── Biometric action ──────────────────────────────────────────── */}
-        {/* TODO Phase 3: call AuthContext.loginBiometric() */}
-        <TouchableOpacity style={styles.buttonSecondary} activeOpacity={0.8}>
-          <Text style={styles.buttonSecondaryText}>Biometrics</Text>
-        </TouchableOpacity>
+          {/* ── Inputs ──────────────────────────────────────────────────── */}
+          <FormInput
+            label="Username"
+            value={username}
+            onChangeText={(t) => { setUsername(t); clearErrors(); }}
+            placeholder="your_username"
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            error={fieldErrors.username}
+            testID="input-username"
+          />
 
-        {/* ── Register link ─────────────────────────────────────────────── */}
-        <View style={styles.registerRow}>
-          <Text style={styles.registerHint}>New to the ecosystem?{'  '}</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.registerLink}>Register Account</Text>
-          </TouchableOpacity>
-        </View>
+          <FormInput
+            ref={passwordRef}
+            label="Password"
+            value={password}
+            onChangeText={(t) => { setPassword(t); clearErrors(); }}
+            placeholder="••••••••"
+            secureTextEntry
+            returnKeyType="done"
+            onSubmitEditing={handleLogin}
+            error={fieldErrors.password}
+            testID="input-password"
+          />
 
-      </View>
+          {/* ── Credentials error ────────────────────────────────────────── */}
+          {submitError ? (
+            <Text style={styles.submitError}>{submitError}</Text>
+          ) : null}
+
+          {/* ── Actions ──────────────────────────────────────────────────── */}
+          <View style={styles.actions}>
+            <PrimaryButton
+              label="Login"
+              onPress={handleLogin}
+              disabled={isSubmitting}
+              testID="btn-login"
+            />
+
+            <View style={styles.spacer} />
+
+            <SecondaryButton
+              label="Use Biometrics"
+              onPress={handleBiometric}
+              disabled={isSubmitting}
+              testID="btn-biometric"
+            />
+
+            {/* Biometric result message */}
+            {biometricMsg ? (
+              <Text style={styles.biometricMsg}>{biometricMsg}</Text>
+            ) : null}
+          </View>
+
+          {/* ── Register link ─────────────────────────────────────────────── */}
+          <View style={styles.registerRow}>
+            <Text style={styles.registerHint}>No account?{'  '}</Text>
+            <Text
+              style={styles.registerLink}
+              onPress={() => navigation.navigate('Register')}
+            >
+              Register
+            </Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
+// ── Styles ────────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: Colors.white,
   },
-  content: {
+  flex: {
     flex: 1,
-    paddingHorizontal: 24,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 32,
   },
-  title: {
-    fontSize: FontSize.screenTitle,
-    fontWeight: '700',
-    color: Colors.primary,
-    textTransform: 'uppercase',
-  },
-  titleUnderline: {
-    width: 48,
-    height: 3,
-    backgroundColor: Colors.primary,
-    marginTop: 8,
-    marginBottom: 24,
-  },
-  description: {
-    fontSize: FontSize.body,
-    color: Colors.secondary,
-    lineHeight: 22,
-    marginBottom: 32,
-  },
-  buttonPrimary: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    alignItems: 'center',
+  submitError: {
+    fontSize: 12,
+    color: '#C0392B',
     marginBottom: 12,
+    marginTop: -4,
   },
-  buttonPrimaryText: {
-    color: Colors.white,
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-  },
-  buttonSecondary: {
-    backgroundColor: Colors.neutral,
-    paddingVertical: 16,
-    alignItems: 'center',
+  actions: {
+    marginTop: 8,
     marginBottom: 32,
   },
-  buttonSecondaryText: {
-    color: Colors.primary,
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
+  spacer: {
+    height: 12,
+  },
+  biometricMsg: {
+    fontSize: 12,
+    color: Colors.secondary,
+    textAlign: 'center',
+    marginTop: 10,
   },
   registerRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   registerHint: {
     fontSize: FontSize.label,

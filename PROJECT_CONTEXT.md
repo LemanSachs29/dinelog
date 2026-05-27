@@ -1,7 +1,9 @@
 # DineLog Project Context
 
 ## Current status
-Phase 1 complete — base project structure, navigation architecture, shared types, and placeholder screens.
+Phase 3 complete — Login and Register screens fully implemented with AuthContext,
+validation, biometric stub, shared components built.
+App compiles with zero TypeScript errors.
 
 The app is for COM6031M Smartphone Application Design and Development Component 2.
 
@@ -95,8 +97,8 @@ No business logic yet.
 
 ## Next tasks (from ROADMAP.md)
 1. ~~Phase 1 — Base structure~~ ✅ Done
-2. **Phase 2 — Foundation logic**: types (done), constants (done), restaurant seed data, storage layer, utility functions (validation, calculations, formatting), AuthContext
-3. Phase 3 — Auth screens (Register, Login with real validation + biometric)
+2. ~~Phase 2 — Foundation logic~~ ✅ Done
+3. ~~Phase 3 — Auth screens~~ ✅ Done
 4. Phase 4 — Restaurant list screen (FlatList + RestaurantCard)
 5. Phase 5 — Restaurant detail screen (ScrollView with 4 sections)
 6. Phase 6 — Add meal screen (date/time pickers, ScoreSelector, validation)

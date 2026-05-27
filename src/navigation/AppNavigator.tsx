@@ -25,6 +25,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../constants/colors';
+import { useAuthContext } from '../context/AuthContext';
 import type { MealDraft } from '../types';
 
 import { LoginScreen } from '../screens/LoginScreen';
@@ -85,7 +86,6 @@ const sharedStackScreenOptions = {
   headerTitleAlign: 'center' as const,
   headerStyle: { backgroundColor: Colors.white },
   headerTintColor: Colors.primary,
-  headerBackTitleVisible: false,
   headerShadowVisible: false,
 };
 
@@ -183,25 +183,37 @@ function MainNavigator() {
 // ─── Root Navigator ───────────────────────────────────────────────────────────
 
 export function AppNavigator() {
+  const { currentUser } = useAuthContext();
+
   return (
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {/* Auth screens — no tab bar, no shared header */}
-      <RootStack.Screen name="Login" component={LoginScreen} />
-      <RootStack.Screen
-        name="Register"
-        component={RegisterScreen}
-        options={{
-          headerShown: true,
-          headerTitle: 'DINE_LOG',
-          headerTitleAlign: 'center',
-          headerStyle: { backgroundColor: Colors.white },
-          headerTintColor: Colors.primary,
-          headerBackTitleVisible: false,
-          headerShadowVisible: false,
-        }}
-      />
-      {/* Main app — tab navigator with nested stacks */}
-      <RootStack.Screen name="Main" component={MainNavigator} />
+      {currentUser === null ? (
+        /*
+         * Auth group — rendered when the user is not logged in.
+         * React Navigation automatically transitions to these screens
+         * when currentUser becomes null (on logout) and away from them
+         * when currentUser is set (on login / registration).
+         * No manual navigate('Login') calls are ever needed.
+         */
+        <>
+          <RootStack.Screen name="Login" component={LoginScreen} />
+          <RootStack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{
+              headerShown: true,
+              headerTitle: 'DINE_LOG',
+              headerTitleAlign: 'center',
+              headerStyle: { backgroundColor: Colors.white },
+              headerTintColor: Colors.primary,
+              headerShadowVisible: false,
+            }}
+          />
+        </>
+      ) : (
+        /* Main app — tab navigator with nested stacks */
+        <RootStack.Screen name="Main" component={MainNavigator} />
+      )}
     </RootStack.Navigator>
   );
 }
