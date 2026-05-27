@@ -1,7 +1,7 @@
 # DineLog Project Context
 
 ## Current status
-Expo React Native TypeScript project created.
+Phase 1 complete — base project structure, navigation architecture, shared types, and placeholder screens.
 
 The app is for COM6031M Smartphone Application Design and Development Component 2.
 
@@ -53,15 +53,54 @@ Minimal, monochrome, inspired by the Component 1 prototype.
 Functionality matters more than pixel-perfect UI.
 
 ## Current implementation notes
-Update this section after every major coding session.
 
-## Next tasks
-1. Implement navigation and placeholder screens.
-2. Implement restaurant mock data.
-3. Implement restaurant list and details.
-4. Implement register/login with AsyncStorage.
-5. Implement meal creation flow.
-6. Implement meals list and meal details.
-7. Add tests.
-8. Write README.
-9. Record demo video.
+### Session 2 — 2026-05-27: Phase 1 — Base project structure
+
+Replaced the flat-stack placeholder with the real navigation architecture.
+Added shared types and design-system constants. All screens are typed placeholders.
+No business logic yet.
+
+**Files created:**
+- `src/types/index.ts` — User, StoredUser, MenuItem, Restaurant, MealItemRating, MealEntry, MealDraft
+- `src/constants/colors.ts` — six colour tokens from colour_palette.png
+- `src/constants/typography.ts` — FontFamily and FontSize tokens
+
+**Files updated:**
+- `src/navigation/AppNavigator.tsx` — final architecture:
+  - RootStack → Login (no header), Register (DINE_LOG header), Main
+  - Main → BottomTabNavigator (Restaurants tab + Meals tab)
+  - RestaurantsTab → RestaurantsStack (RestaurantList, RestaurantDetail, AddMeal, ConfirmMeal modal)
+  - MealsTab → MealsStack (MealList, MealDetail)
+  - Exports four param-list types consumed by each screen
+- All 8 screens — rewritten with correct TypeScript props types, design-system colours,
+  uppercase titles, TODO comments marking Phase 3–8 implementation points,
+  and working navigation buttons that demonstrate every route
+
+**Navigation flow (working end-to-end):**
+- Login → Register → goBack
+- Login → Main (tab navigator, lands on RestaurantList)
+- RestaurantList → RestaurantDetail (passes restaurantId)
+- RestaurantDetail → AddMeal (passes restaurantId)
+- AddMeal → ConfirmMeal modal (passes MealDraft placeholder)
+- ConfirmMeal → Edit (goBack, AddMeal state preserved) / Confirm → RestaurantList
+- MealList tab → MealDetail (passes mealId)
+- MealDetail → goBack
+- AddMeal and MealDetail hide the tab bar via useFocusEffect ✓
+
+**Architecture in place:**
+- Four exported param-list types (RootStackParamList, MainTabParamList, RestaurantsStackParamList, MealsStackParamList)
+- Each screen typed with NativeStackScreenProps<CorrectParamList, 'ScreenName'>
+- Tab bar: black active / white inactive, RESTAURANTS and MEALS labels
+- No business logic, no storage, no context, no mock data — all deferred
+
+## Next tasks (from ROADMAP.md)
+1. ~~Phase 1 — Base structure~~ ✅ Done
+2. **Phase 2 — Foundation logic**: types (done), constants (done), restaurant seed data, storage layer, utility functions (validation, calculations, formatting), AuthContext
+3. Phase 3 — Auth screens (Register, Login with real validation + biometric)
+4. Phase 4 — Restaurant list screen (FlatList + RestaurantCard)
+5. Phase 5 — Restaurant detail screen (ScrollView with 4 sections)
+6. Phase 6 — Add meal screen (date/time pickers, ScoreSelector, validation)
+7. Phase 7 — Confirmation screen (modal, save to storage)
+8. Phase 8 — Meal history screens (MealList + MealDetail)
+9. Phase 9 — Tests (28 test cases)
+10. Phase 10 — README
