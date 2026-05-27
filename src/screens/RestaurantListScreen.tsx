@@ -1,55 +1,115 @@
 /**
- * RestaurantListScreen
+ * src/screens/RestaurantListScreen.tsx
  *
- * Displays all 10 York restaurants as scrollable cards.
- * Lives in the Restaurants tab — the default landing screen after login.
+ * Default landing screen after login.
+ * Renders all 10 York restaurants as a scrollable FlatList.
  *
- * Phase 1: placeholder with one demo navigation button.
- * Phase 4: FlatList of RestaurantCard components using seed data from src/data/restaurants.ts.
- *           Each card navigates to RestaurantDetail with the real restaurantId.
+ * Data strategy:
+ *   - Restaurants: static import from src/data/restaurants.ts (never changes)
+ *   - Scores: read from AsyncStorage once per focus event so they update
+ *     automatically after a new meal is saved without needing a manual refresh.
+ *   - One getMeals() call fetches all user meals; scores are computed in memory
+ *     by filtering per restaurantId — avoids 10 separate storage reads.
+ *
+ * Navigation:
+ *   Pressing a card navigates to RestaurantDetail with the restaurantId param.
  */
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+
+import React, { useCallback, useState } from 'react';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Colors } from '../constants/colors';
-import { FontSize } from '../constants/typography';
+import { useAuthContext } from '../context/AuthContext';
+import { getMeals } from '../storage/mealStorage';
+import { restaurants } from '../data/restaurants';
+import { calcRestaurantAvgScore } from '../utils/calculations';
+import { ScreenTitle } from '../components/ScreenTitle';
+import { RestaurantCard } from '../components/RestaurantCard';
 import type { RestaurantsStackParamList } from '../navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RestaurantsStackParamList, 'RestaurantList'>;
 
+/**
+ * Map of restaurantId → computed average score (or null if no meals yet).
+ * Built fresh on every focus event.
+ */
+type ScoreMap = Record<string, number | null>;
+
 export function RestaurantListScreen({ navigation }: Props) {
+  const { currentUser } = useAuthContext();
+  const [scoreMap, setScoreMap] = useState<ScoreMap>({});
+
+  // ── Reload scores whenever the screen comes into focus ────────────────────
+  //
+  // useCallback is required by useFocusEffect — it memoises the effect so it
+  // doesn't re-register on every render, only when currentUser changes.
+
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+
+      async function loadScores() {
+        if (!currentUser) return;
+
+        // Single storage read for all of this user's meals
+        const allMeals = await getMeals(currentUser.id);
+        if (cancelled) return;
+
+        const map: ScoreMap = {};
+        for (const restaurant of restaurants) {
+          const forThisRestaurant = allMeals.filter(
+            (m) => m.restaurantId === restaurant.id,
+          );
+          map[restaurant.id] = calcRestaurantAvgScore(forThisRestaurant);
+        }
+
+        setScoreMap(map);
+      }
+
+      loadScores();
+
+      // Cleanup: ignore the result if the screen unmounted or lost focus
+      // before the async call completed
+      return () => {
+        cancelled = true;
+      };
+    }, [currentUser]),
+  );
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <View style={styles.content}>
-
-        {/* ── Title ─────────────────────────────────────────────────────── */}
-        <Text style={styles.title}>Restaurants</Text>
-        <View style={styles.titleUnderline} />
-
-        {/* ── Placeholder notice ────────────────────────────────────────── */}
-        <Text style={styles.description}>
-          Phase 4 will render all 10 York restaurants as scrollable cards,
-          each showing name, image placeholder, address, short description,
-          and average score (or N/A).
-        </Text>
-
-        {/* ── TODO Phase 4: FlatList of RestaurantCard ─────────────────── */}
-
-        {/* ── Demo navigation ───────────────────────────────────────────── */}
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={() =>
-            navigation.navigate('RestaurantDetail', { restaurantId: 'rest-01' })
-          }
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonPrimaryText}>Open Restaurant (demo)</Text>
-        </TouchableOpacity>
-
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <FlatList
+        data={restaurants}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <RestaurantCard
+            restaurant={item}
+            avgScore={scoreMap[item.id] ?? null}
+            onPress={() =>
+              navigation.navigate('RestaurantDetail', { restaurantId: item.id })
+            }
+          />
+        )}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <ScreenTitle title="Restaurants" />
+          </View>
+        }
+        ItemSeparatorComponent={() => (
+          <View style={styles.separator} />
+        )}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
   );
 }
 
@@ -58,40 +118,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.white,
   },
-  content: {
-    flex: 1,
+  listContent: {
+    paddingBottom: 32,
+  },
+  header: {
     paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingTop: 24,
   },
-  title: {
-    fontSize: FontSize.screenTitle,
-    fontWeight: '700',
-    color: Colors.primary,
-    textTransform: 'uppercase',
-  },
-  titleUnderline: {
-    width: 48,
-    height: 3,
-    backgroundColor: Colors.primary,
-    marginTop: 8,
-    marginBottom: 24,
-  },
-  description: {
-    fontSize: FontSize.body,
-    color: Colors.secondary,
-    lineHeight: 22,
-    marginBottom: 32,
-  },
-  buttonPrimary: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  buttonPrimaryText: {
-    color: Colors.white,
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
+  separator: {
+    height: 12,
+    backgroundColor: Colors.white,
   },
 });

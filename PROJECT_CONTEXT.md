@@ -1,8 +1,8 @@
 # DineLog Project Context
 
 ## Current status
-Phase 3 complete — Login and Register screens fully implemented with AuthContext,
-validation, biometric stub, shared components built.
+Phase 8 complete — Meal history screens fully implemented.
+MealCard, MealListScreen (with logout), MealDetailScreen (read-only, cross-stack nav).
 App compiles with zero TypeScript errors.
 
 The app is for COM6031M Smartphone Application Design and Development Component 2.
@@ -99,10 +99,10 @@ No business logic yet.
 1. ~~Phase 1 — Base structure~~ ✅ Done
 2. ~~Phase 2 — Foundation logic~~ ✅ Done
 3. ~~Phase 3 — Auth screens~~ ✅ Done
-4. Phase 4 — Restaurant list screen (FlatList + RestaurantCard)
-5. Phase 5 — Restaurant detail screen (ScrollView with 4 sections)
-6. Phase 6 — Add meal screen (date/time pickers, ScoreSelector, validation)
-7. Phase 7 — Confirmation screen (modal, save to storage)
-8. Phase 8 — Meal history screens (MealList + MealDetail)
+4. ~~Phase 4 — Restaurant list screen~~ ✅ Done
+5. ~~Phase 5 — Restaurant detail screen~~ ✅ Done
+6. ~~Phase 6 — Add meal screen~~ ✅ Done
+7. ~~Phase 7 — Confirmation screen~~ ✅ Done
+8. ~~Phase 8 — Meal history screens (MealList + MealDetail)~~ ✅ Done
 9. Phase 9 — Tests (28 test cases)
 10. Phase 10 — README
