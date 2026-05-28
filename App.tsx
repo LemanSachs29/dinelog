@@ -10,8 +10,6 @@
  * While the session is being restored from AsyncStorage it renders a plain
  * white screen — this prevents a brief flash of the Login screen for users
  * who are already logged in.
- *
- * TODO Phase 3: add font loading here with expo-font / @expo-google-fonts
  */
 
 import React from 'react';

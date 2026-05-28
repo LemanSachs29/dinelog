@@ -72,7 +72,7 @@ export function RestaurantListScreen({ navigation }: Props) {
         setScoreMap(map);
       }
 
-      loadScores();
+      void loadScores();
 
       // Cleanup: ignore the result if the screen unmounted or lost focus
       // before the async call completed

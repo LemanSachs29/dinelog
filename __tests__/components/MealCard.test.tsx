@@ -9,7 +9,7 @@
  */
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { MealCard } from '../../src/components/MealCard';
 import type { MealEntry } from '../../src/types';
 
