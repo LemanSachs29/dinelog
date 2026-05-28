@@ -285,7 +285,7 @@ npm run test:coverage
 
 ## 11. Video Demonstration
 
-YouTube demonstration link will be added before final submission.
+[YouTube demonstration link.](https://youtu.be/Gd_m0_lWnnk)
 
 ---
 
