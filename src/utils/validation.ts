@@ -137,3 +137,28 @@ export function validateMealEntry(draft: { items: MealItemRating[] }): MealEntry
 export function isScoreInRange(score: number): boolean {
   return Number.isInteger(score) && score >= 1 && score <= 5;
 }
+
+// ─── Date / Time ──────────────────────────────────────────────────────────────
+
+/**
+ * Returns true if the string is a real calendar date in YYYY-MM-DD format.
+ * Rejects out-of-range months/days (e.g. 2026-99-99, 2026-02-31).
+ */
+export function isValidDate(date: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const [year, month, day] = date.split('-').map(Number);
+  if (month < 1 || month > 12 || day < 1) return false;
+  // Date constructor overflows invalid days (e.g. Feb 31 → Mar 3); detect that.
+  const d = new Date(year, month - 1, day);
+  return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+}
+
+/**
+ * Returns true if the string is a valid 24-hour time in HH:MM format.
+ * Hour must be 00–23; minute must be 00–59.
+ */
+export function isValidTime(time: string): boolean {
+  if (!/^\d{2}:\d{2}$/.test(time)) return false;
+  const [hour, minute] = time.split(':').map(Number);
+  return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
+}

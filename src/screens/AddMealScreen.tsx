@@ -32,7 +32,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Colors } from '../constants/colors';
 import { FontSize } from '../constants/typography';
 import { findRestaurantById } from '../data/restaurants';
-import { validateMealEntry } from '../utils/validation';
+import { validateMealEntry, isValidDate, isValidTime } from '../utils/validation';
 import { SectionTitle } from '../components/SectionTitle';
 import { FormInput } from '../components/FormInput';
 import { MenuItemSelectRow } from '../components/MenuItemSelectRow';
@@ -135,20 +135,20 @@ export function AddMealScreen({ navigation, route }: Props) {
   function handleContinue() {
     const errors: string[] = [];
 
-    // 1. Date format check
+    // 1. Date format + calendar check
     const trimDate = date.trim();
     if (!trimDate) {
       errors.push('Please enter a date.');
-    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(trimDate)) {
-      errors.push('Date must be in YYYY-MM-DD format (e.g. 2026-05-27).');
+    } else if (!isValidDate(trimDate)) {
+      errors.push('Date must be a valid date in YYYY-MM-DD format (e.g. 2026-05-27).');
     }
 
-    // 2. Time format check
+    // 2. Time format + range check
     const trimTime = time.trim();
     if (!trimTime) {
       errors.push('Please enter a time.');
-    } else if (!/^\d{2}:\d{2}$/.test(trimTime)) {
-      errors.push('Time must be in HH:MM format (e.g. 13:30).');
+    } else if (!isValidTime(trimTime)) {
+      errors.push('Time must be in HH:MM format with a valid 24-hour time (e.g. 13:30).');
     }
 
     // 3. At least one item selected

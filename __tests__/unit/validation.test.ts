@@ -14,12 +14,23 @@
  *   MEAL-01 no items selected   — empty array → not-enough-items error
  *   MEAL-02 missing scores      — score = 0 → out-of-range error
  *   MEAL-03 score out of range  — score = 6 → out-of-range error
+ *   DATE-01 valid date          — '2026-06-09' → true
+ *   DATE-02 invalid format      — 'abcd-ef-gh' → false
+ *   DATE-03 impossible month    — '2026-99-01' and '2026-00-10' → false
+ *   DATE-04 impossible day      — '2026-02-31' → false
+ *   DATE-05 leap-year day       — '2024-02-29' → true, '2025-02-29' → false
+ *   TIME-01 valid time          — '13:45' and '00:00' and '23:59' → true
+ *   TIME-02 hour out of range   — '24:00' and '25:00' → false
+ *   TIME-03 minute out of range — '12:60' → false
+ *   TIME-04 invalid format      — 'ab:cd' → false
  */
 
 import {
   validateRegistration,
   validateLogin,
   validateMealEntry,
+  isValidDate,
+  isValidTime,
 } from '../../src/utils/validation';
 
 // ── Registration ──────────────────────────────────────────────────────────────
@@ -124,5 +135,63 @@ describe('validateMealEntry', () => {
     });
     expect(result.valid).toBe(false);
     expect(result.errors.length).toBeGreaterThan(0);
+  });
+});
+
+// ── isValidDate ───────────────────────────────────────────────────────────────
+
+describe('isValidDate', () => {
+  // DATE-01
+  it('returns true for a valid calendar date', () => {
+    expect(isValidDate('2026-06-09')).toBe(true);
+  });
+
+  // DATE-02
+  it('returns false for a non-numeric format', () => {
+    expect(isValidDate('abcd-ef-gh')).toBe(false);
+  });
+
+  // DATE-03
+  it('returns false for an out-of-range month', () => {
+    expect(isValidDate('2026-99-01')).toBe(false);
+    expect(isValidDate('2026-00-10')).toBe(false);
+  });
+
+  // DATE-04
+  it('returns false for an impossible day (e.g. Feb 31)', () => {
+    expect(isValidDate('2026-02-31')).toBe(false);
+  });
+
+  // DATE-05
+  it('handles leap years correctly', () => {
+    expect(isValidDate('2024-02-29')).toBe(true);   // 2024 is a leap year
+    expect(isValidDate('2025-02-29')).toBe(false);  // 2025 is not
+  });
+});
+
+// ── isValidTime ───────────────────────────────────────────────────────────────
+
+describe('isValidTime', () => {
+  // TIME-01
+  it('returns true for valid 24-hour times', () => {
+    expect(isValidTime('13:45')).toBe(true);
+    expect(isValidTime('00:00')).toBe(true);
+    expect(isValidTime('23:59')).toBe(true);
+  });
+
+  // TIME-02
+  it('returns false when the hour is out of range', () => {
+    expect(isValidTime('24:00')).toBe(false);
+    expect(isValidTime('25:00')).toBe(false);
+  });
+
+  // TIME-03
+  it('returns false when the minute is out of range', () => {
+    expect(isValidTime('12:60')).toBe(false);
+  });
+
+  // TIME-04
+  it('returns false for non-numeric input', () => {
+    expect(isValidTime('ab:cd')).toBe(false);
   });
 });
