@@ -3,7 +3,7 @@
  *
  * Hub screen for a single restaurant.  Four sections:
  *
- *   1. Header      — image placeholder, name, address, description
+ *   1. Header      — restaurant image, name, address, description
  *   2. Score       — user's overall average score for this restaurant
  *   3. MENU        — all menu items with per-item average scores
  *   4. LAST MEALS  — previous meals at this restaurant, newest first

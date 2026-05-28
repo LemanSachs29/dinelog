@@ -5,7 +5,7 @@
  *
  * Layout (top → bottom, full screen width):
  *   ┌──────────────────────────────────────────┐
- *   │  [dark image placeholder — 160px tall]   │
+ *   │  [restaurant image — 160px tall]          │
  *   ├──────────────────────────────────────────┤
  *   │  RESTAURANT NAME               [badge]   │
  *   │  Address snippet                         │

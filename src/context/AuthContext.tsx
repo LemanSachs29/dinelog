@@ -27,7 +27,6 @@ import {
   saveSession,
   clearSession,
   saveLastUsername,
-  getLastUsername,
 } from '../storage/userStorage';
 import { generateId } from '../utils/formatting';
 
@@ -122,17 +121,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   };
 
   const loginBiometric = async (): Promise<'ok' | 'unavailable' | 'failed'> => {
-    /**
-     * TODO Phase 3: wire up expo-local-authentication here.
-     *
-     * Steps:
-     *  1. npx expo install expo-local-authentication
-     *  2. Check LocalAuthentication.hasHardwareAsync() → return 'unavailable' if false
-     *  3. Check LocalAuthentication.isEnrolledAsync()  → return 'unavailable' if false
-     *  4. Call LocalAuthentication.authenticateAsync()
-     *  5. On success: getLastUsername() → findUserByUsername() → login flow
-     *  6. Return 'ok' | 'failed' accordingly
-     */
+    // expo-local-authentication is not installed; biometric login is not available.
     return 'unavailable';
   };
 
