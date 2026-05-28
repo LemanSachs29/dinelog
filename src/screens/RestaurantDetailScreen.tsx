@@ -23,6 +23,7 @@ import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
+  Image,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
@@ -128,8 +129,12 @@ export function RestaurantDetailScreen({ navigation, route }: Props) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* ── 1. Full-width image placeholder ─────────────────────────── */}
-        <View style={styles.imagePlaceholder} />
+        {/* ── 1. Full-width restaurant image ───────────────────────────── */}
+        <Image
+          source={restaurant.image}
+          style={styles.heroImage}
+          resizeMode="cover"
+        />
 
         {/* ── 2. Padded content area ───────────────────────────────────── */}
         <View style={styles.content}>
@@ -232,11 +237,10 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  // ── Image placeholder ──────────────────────────────────────────────────────
-  imagePlaceholder: {
+  // ── Hero image ─────────────────────────────────────────────────────────────
+  heroImage: {
     width: '100%',
     height: 200,
-    backgroundColor: '#2a2a2a',
   },
 
   // ── Content wrapper ────────────────────────────────────────────────────────

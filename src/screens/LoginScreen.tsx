@@ -35,13 +35,12 @@ import { validateLogin } from '../utils/validation';
 import { ScreenTitle } from '../components/ScreenTitle';
 import { FormInput } from '../components/FormInput';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { SecondaryButton } from '../components/SecondaryButton';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export function LoginScreen({ navigation }: Props) {
-  const { login, loginBiometric } = useAuthContext();
+  const { login } = useAuthContext();
 
   // ── Form state ────────────────────────────────────────────────────────────
   const [username, setUsername] = useState('');
@@ -56,9 +55,6 @@ export function LoginScreen({ navigation }: Props) {
   // Server-level error shown below the form (wrong credentials)
   const [submitError, setSubmitError] = useState('');
 
-  // Biometric result message shown below the biometric button
-  const [biometricMsg, setBiometricMsg] = useState('');
-
   // Prevents double-submit while the async call is in flight
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -70,7 +66,6 @@ export function LoginScreen({ navigation }: Props) {
   function clearErrors() {
     setFieldErrors({});
     setSubmitError('');
-    setBiometricMsg('');
   }
 
   async function handleLogin() {
@@ -90,17 +85,6 @@ export function LoginScreen({ navigation }: Props) {
       setIsSubmitting(false);
       // On 'ok': AuthContext sets currentUser → AppNavigator renders Main automatically
     }
-  }
-
-  async function handleBiometric() {
-    clearErrors();
-    const result = await loginBiometric();
-    if (result === 'unavailable') {
-      setBiometricMsg('Biometric authentication is not available on this device.');
-    } else if (result === 'failed') {
-      setBiometricMsg('Biometric authentication failed. Please try again.');
-    }
-    // On 'ok': AuthContext sets currentUser → AppNavigator renders Main automatically
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -156,20 +140,6 @@ export function LoginScreen({ navigation }: Props) {
               disabled={isSubmitting}
               testID="btn-login"
             />
-
-            <View style={styles.spacer} />
-
-            <SecondaryButton
-              label="Use Biometrics"
-              onPress={handleBiometric}
-              disabled={isSubmitting}
-              testID="btn-biometric"
-            />
-
-            {/* Biometric result message */}
-            {biometricMsg ? (
-              <Text style={styles.biometricMsg}>{biometricMsg}</Text>
-            ) : null}
           </View>
 
           {/* ── Register link ─────────────────────────────────────────────── */}
@@ -213,15 +183,6 @@ const styles = StyleSheet.create({
   actions: {
     marginTop: 8,
     marginBottom: 32,
-  },
-  spacer: {
-    height: 12,
-  },
-  biometricMsg: {
-    fontSize: 12,
-    color: Colors.secondary,
-    textAlign: 'center',
-    marginTop: 10,
   },
   registerRow: {
     flexDirection: 'row',

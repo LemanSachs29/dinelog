@@ -107,6 +107,8 @@ export function MealListScreen({ navigation }: Props) {
                 <Text style={styles.logoutLink}>Log out</Text>
               </TouchableOpacity>
             </View>
+            {/* A4 — active-user indicator so the assessor can verify user-specific data */}
+            <Text style={styles.userHint}>@{currentUser?.username}</Text>
             <View style={styles.titleUnderline} />
           </View>
         }
@@ -165,9 +167,17 @@ const styles = StyleSheet.create({
   },
   logoutLink: {
     fontSize: FontSize.label,
-    color: Colors.secondary,
+    color: Colors.primary,
+    fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  userHint: {
+    fontSize: FontSize.label,
+    color: Colors.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 4,
   },
   titleUnderline: {
     width: 48,

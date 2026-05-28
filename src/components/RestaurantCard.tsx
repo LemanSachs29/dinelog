@@ -20,7 +20,7 @@
  */
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FontSize } from '../constants/typography';
 import { ScoreBadge } from './ScoreBadge';
@@ -39,8 +39,12 @@ export function RestaurantCard({ restaurant, avgScore, onPress }: Props) {
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* ── Image placeholder ───────────────────────────────────────────── */}
-      <View style={styles.imagePlaceholder} />
+      {/* ── Restaurant image ─────────────────────────────────────────────── */}
+      <Image
+        source={restaurant.image}
+        style={styles.image}
+        resizeMode="cover"
+      />
 
       {/* ── Text body ───────────────────────────────────────────────────── */}
       <View style={styles.body}>
@@ -56,6 +60,11 @@ export function RestaurantCard({ restaurant, avgScore, onPress }: Props) {
         <Text style={styles.address} numberOfLines={1}>
           {restaurant.address}
         </Text>
+
+        {/* Description snippet */}
+        <Text style={styles.description} numberOfLines={2}>
+          {restaurant.description}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -66,10 +75,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     width: '100%',
   },
-  imagePlaceholder: {
+  image: {
     width: '100%',
     height: 160,
-    backgroundColor: '#2a2a2a',
   },
   body: {
     paddingHorizontal: 16,
@@ -92,5 +100,11 @@ const styles = StyleSheet.create({
   address: {
     fontSize: FontSize.body,
     color: Colors.secondary,
+    marginBottom: 4,
+  },
+  description: {
+    fontSize: FontSize.label,
+    color: Colors.secondary,
+    lineHeight: 18,
   },
 });

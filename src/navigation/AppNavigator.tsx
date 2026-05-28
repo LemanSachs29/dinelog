@@ -161,20 +161,27 @@ function MainNavigator() {
           borderTopColor: Colors.border,
           borderTopWidth: 1,
         },
-        tabBarIcon: ({ color, size }) => (
-          <Ionicons name="restaurant" size={size} color={color} />
-        ),
       }}
     >
       <MainTabs.Screen
         name="RestaurantsTab"
         component={RestaurantsNavigator}
-        options={{ tabBarLabel: 'Restaurants' }}
+        options={{
+          tabBarLabel: 'Restaurants',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="restaurant" size={size} color={color} />
+          ),
+        }}
       />
       <MainTabs.Screen
         name="MealsTab"
         component={MealsNavigator}
-        options={{ tabBarLabel: 'Meals' }}
+        options={{
+          tabBarLabel: 'Meals',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="receipt" size={size} color={color} />
+          ),
+        }}
       />
     </MainTabs.Navigator>
   );

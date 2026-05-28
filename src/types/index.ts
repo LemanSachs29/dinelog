@@ -44,6 +44,11 @@ export type Restaurant = {
   address: string;
   /** Full paragraph description shown on the detail screen */
   description: string;
+  /**
+   * Local image asset — loaded with require() so React Native bundles it.
+   * Type `number` is what require() returns for static image imports.
+   */
+  image: number;
   menu: MenuItem[];
 };
 
