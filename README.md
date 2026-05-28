@@ -291,9 +291,9 @@ YouTube demonstration link will be added before final submission.
 
 ## 12. Final Submission Information
 
-Final commit hash: TO_BE_ADDED
+Final commit hash: 9768637ec83956b3b38906243c3eb4247e16fa40
 
-Submission date: TO_BE_ADDED
+Submission date: 05-28-2026
 
 ---
 
