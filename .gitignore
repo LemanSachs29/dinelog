@@ -51,6 +51,7 @@ yarn-error.*
 
 .claude/
 AGENTS.md
+CLAUDE.md
 
 # Internal drafting documents
 
@@ -58,3 +59,4 @@ docs/brief.md
 docs/design-report.md
 docs/implementation-notes.md
 docs/test-plan.md
+ROADMAP.md
