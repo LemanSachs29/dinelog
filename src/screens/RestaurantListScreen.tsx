@@ -57,19 +57,23 @@ export function RestaurantListScreen({ navigation }: Props) {
       async function loadScores() {
         if (!currentUser) return;
 
-        // Single storage read for all of this user's meals
-        const allMeals = await getMeals(currentUser.id);
-        if (cancelled) return;
+        try {
+          // Single storage read for all of this user's meals
+          const allMeals = await getMeals(currentUser.id);
+          if (cancelled) return;
 
-        const map: ScoreMap = {};
-        for (const restaurant of restaurants) {
-          const forThisRestaurant = allMeals.filter(
-            (m) => m.restaurantId === restaurant.id,
-          );
-          map[restaurant.id] = calcRestaurantAvgScore(forThisRestaurant);
+          const map: ScoreMap = {};
+          for (const restaurant of restaurants) {
+            const forThisRestaurant = allMeals.filter(
+              (m) => m.restaurantId === restaurant.id,
+            );
+            map[restaurant.id] = calcRestaurantAvgScore(forThisRestaurant);
+          }
+
+          setScoreMap(map);
+        } catch {
+          // Storage error — scores stay null (shown as N/A), app continues
         }
-
-        setScoreMap(map);
       }
 
       void loadScores();

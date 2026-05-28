@@ -56,10 +56,15 @@ export function MealListScreen({ navigation }: Props) {
       let cancelled = false;
 
       async function load() {
-        const data = await getMeals(currentUser!.id);
-        if (!cancelled) {
-          setMeals(data);
-          setIsLoading(false);
+        try {
+          const data = await getMeals(currentUser!.id);
+          if (!cancelled) {
+            setMeals(data);
+            setIsLoading(false);
+          }
+        } catch {
+          // Storage error — show empty state instead of spinning indefinitely
+          if (!cancelled) setIsLoading(false);
         }
       }
 

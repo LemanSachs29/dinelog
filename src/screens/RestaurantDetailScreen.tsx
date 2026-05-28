@@ -72,24 +72,28 @@ export function RestaurantDetailScreen({ navigation, route }: Props) {
       async function loadData() {
         if (!currentUser || !restaurant) return;
 
-        const restaurantMeals = await getMealsByRestaurant(currentUser.id, restaurantId);
-        if (cancelled) return;
+        try {
+          const restaurantMeals = await getMealsByRestaurant(currentUser.id, restaurantId);
+          if (cancelled) return;
 
-        // Overall restaurant score
-        setAvgScore(calcRestaurantAvgScore(restaurantMeals));
+          // Overall restaurant score
+          setAvgScore(calcRestaurantAvgScore(restaurantMeals));
 
-        // Per-item scores (keyed by menuItemId)
-        const scores: Record<string, number | null> = {};
-        for (const item of restaurant.menu) {
-          scores[item.id] = calcMenuItemAvgScore(restaurantMeals, item.id);
+          // Per-item scores (keyed by menuItemId)
+          const scores: Record<string, number | null> = {};
+          for (const item of restaurant.menu) {
+            scores[item.id] = calcMenuItemAvgScore(restaurantMeals, item.id);
+          }
+          setItemScores(scores);
+
+          // Store meals for the Last Meals section (already sorted newest-first)
+          setMeals(restaurantMeals);
+        } catch {
+          // Storage error — scores and meals stay empty, app continues
         }
-        setItemScores(scores);
-
-        // Store meals for the Last Meals section (already sorted newest-first)
-        setMeals(restaurantMeals);
       }
 
-      loadData();
+      void loadData();
       return () => { cancelled = true; };
     }, [currentUser, restaurantId, restaurant]),
   );
